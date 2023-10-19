@@ -6,19 +6,16 @@ import { fetchInspections } from './data/store/slices/inspectionSlice';
 const App: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
-  // Trigger the fetchInspections action on component mount
   useEffect(() => {
     dispatch(fetchInspections());
   }, [dispatch]);
 
-  // Use useSelector to select inspections, status, and error from the Redux store
   const inspections = useSelector(
     (state: RootState) => state.inspection.inspections,
   );
   const status = useSelector((state: RootState) => state.inspection.status);
   const error = useSelector((state: RootState) => state.inspection.error);
 
-  // Render logic based on the fetch status
   if (status === 'loading') {
     return <div>Loading...</div>;
   }
