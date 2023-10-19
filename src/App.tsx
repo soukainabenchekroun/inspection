@@ -1,26 +1,51 @@
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import './styles/App.css';
-import { RootState } from './data/store/store';
-import { login, logout } from './data/store/slices/userSlice';
-import { IUser } from './types/user';
+import { AppDispatch, RootState } from './data/store/store';
+import { fetchInspections } from './data/store/slices/inspectionSlice';
 
-function App() {
-  const dispatch = useDispatch();
-  const userState = useSelector((state: RootState) => state.user);
-  const user: IUser | null = userState.user;
+const App: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
 
-  if (!user) {
-    return (
-      <button onClick={() => dispatch(login({ name: 'John' }))}>Login</button>
-    );
+  // Trigger the fetchInspections action on component mount
+  useEffect(() => {
+    dispatch(fetchInspections());
+  }, [dispatch]);
+
+  // Use useSelector to select inspections, status, and error from the Redux store
+  const inspections = useSelector(
+    (state: RootState) => state.inspection.inspections,
+  );
+  const status = useSelector((state: RootState) => state.inspection.status);
+  const error = useSelector((state: RootState) => state.inspection.error);
+
+  // Render logic based on the fetch status
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+
+  if (status === 'failed') {
+    return <div>Error: {error}</div>;
   }
 
   return (
     <div>
-      Hello, {user && user.name}
-      <button onClick={() => dispatch(logout())}>Logout</button>
+      <h2>Inspections</h2>
+      <ul>
+        {inspections.map((inspection, index) => (
+          <li key={index}>
+            <h3>{inspection.name}</h3>
+            <p>Installation Type: {inspection.installationType}</p>
+            <p>Construction Year: {inspection.constructionYear}</p>
+            <p>Company: {inspection.company}</p>
+            <p>Type: {inspection.type}</p>
+            <p>Diameter: {inspection.diameter}</p>
+            <p>Material: {inspection.material}</p>
+            <p>Coating: {inspection.coating}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
 
 export default App;
